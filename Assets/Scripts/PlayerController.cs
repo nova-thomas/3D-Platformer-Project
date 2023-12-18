@@ -9,8 +9,12 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed;
     public float jumpForce;
     public float gravityScale;
+    public float rotateSpeed;
     public CharacterController controller;
     public Animator Anim;
+    public Transform pivot;
+    public GameObject playerModel;
+
 
 
     // Private Variables
@@ -53,6 +57,14 @@ public class PlayerController : MonoBehaviour
 
         // Applying movement
         controller.Move(moveDir * Time.deltaTime);
+
+        // Directional Movement
+        if(Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        {
+            transform.rotation = Quaternion.Euler(0f, pivot.rotation.eulerAngles.y, 0f);
+            Quaternion newRotation = Quaternion.LookRotation(new Vector3(moveDir.x, 0f, moveDir.z));
+            playerModel.transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, rotateSpeed * Time.deltaTime);
+        }
 
         Anim.SetBool("isGrounded", controller.isGrounded);
         Anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
